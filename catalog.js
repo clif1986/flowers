@@ -4,7 +4,7 @@ const catalogProducts = [
         id: "vitr9",
         category: "Напольні",
         name: "Вітрило-9",
-        price: 950,
+        price: 1950,
         old_price: 1450,
         badge: "Хіт продажів",
         dimensions: "70 x 18 x 90",
@@ -44,4 +44,5 @@ const catalogProducts = [
         bowls: "10 / 13",
         image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80" // Заміни на своє фото
     }
+
 ];
