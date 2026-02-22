@@ -14,305 +14,145 @@
             background-color: #0d0d0d;
             color: #f4f4f4;
             scroll-behavior: smooth;
-            padding-bottom: 80px;
+            padding-bottom: 90px; /* Місце для липкого кошика */
         }
 
-        h1,
-        h2,
-        h3 {
-            font-family: 'Montserrat', sans-serif;
-        }
-
-        .gold-accent {
-            color: #D4AF37;
-        }
-
-        .gold-bg {
-            background-color: #D4AF37;
-        }
-
-        .card-glass {
-            background: #161616;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .stat-box {
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(212, 175, 55, 0.1);
-        }
-
-        .timer-box {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 1rem;
-        }
-
-        .btn-shadow {
-            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .btn-shadow:active {
-            transform: scale(0.95);
-        }
-
-        .play-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
-        }
-
-        .hide-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-
-        .hide-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
+        h1, h2, h3 { font-family: 'Montserrat', sans-serif; }
+        .gold-accent { color: #D4AF37; }
+        .gold-bg { background-color: #D4AF37; }
+        .card-glass { background: #161616; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .stat-box { background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(212, 175, 55, 0.1); }
+        .timer-box { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 1rem; }
+        .btn-shadow { box-shadow: 0 10px 25px rgba(212, 175, 55, 0.2); transition: all 0.3s ease; }
+        .btn-shadow:active { transform: scale(0.95); }
+        
+        .play-btn { display: flex; align-items: center; justify-content: center; }
+        .play-btn svg { margin-left: 4px; /* Ідеальне центрування трикутника Play */ }
+        .play-btn:hover { transform: scale(1.1); box-shadow: 0 0 30px rgba(212, 175, 55, 0.5); }
+        
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
         .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(8px);
-            justify-content: center;
-            align-items: flex-end;
-            padding: 1rem;
-            padding-bottom: 2rem;
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(8px);
+            justify-content: center; align-items: flex-end; padding: 1rem; padding-bottom: 2rem;
         }
 
-        .cart-animation {
-            animation: slideUp 0.3s ease-out forwards;
-        }
+        .cart-animation { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        @keyframes slideUp {
-            from {
-                transform: translateY(100%);
-                opacity: 0;
-            }
+        /* Нова анімація для товарів при перемиканні вкладок */
+        .fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .floating-cart {
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform: translateY(150%);
-        }
-
-        .floating-cart.visible {
-            transform: translateY(0);
-        }
+        .floating-cart { transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform: translateY(150%); }
+        .floating-cart.visible { transform: translateY(0); }
     </style>
 </head>
 
 <body class="antialiased">
+    <div id="global-toast" class="fixed top-6 left-0 right-0 mx-auto w-max max-w-[90%] bg-[#111]/90 backdrop-blur-xl border border-[#D4AF37]/30 px-5 py-3 rounded-2xl opacity-0 transition-all duration-400 z-[9999] pointer-events-none transform -translate-y-12 shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex items-center gap-4">
+        <div class="w-8 h-8 rounded-full gold-bg flex items-center justify-center text-black shrink-0 shadow-[0_0_15px_rgba(212,175,55,0.5)]">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+            </svg>
+        </div>
+        <div class="text-left">
+            <h4 id="toast-product-name" class="font-black text-[11px] uppercase tracking-widest text-white mb-0.5">Товар у кошику</h4>
+            <p class="text-[9px] text-[#D4AF37] uppercase tracking-widest font-bold">Чудовий вибір!</p>
+        </div>
+    </div>
 
-    <header
-        class="relative mx-auto w-fit max-w-full max-h-[100dvh] flex items-center justify-center border-b border-white/10 shadow-2xl bg-black overflow-hidden">
-        <img src="foto/main.jpg" alt="Підставки для квітів"
-            class="w-auto h-auto max-w-full max-h-[100dvh] object-contain block pointer-events-none" />
+    <header class="relative mx-auto w-fit max-w-full max-h-[100dvh] flex items-center justify-center border-b border-white/10 shadow-2xl bg-black overflow-hidden">
+        <img src="foto/main.jpg" alt="Підставки для квітів" class="w-auto h-auto max-w-full max-h-[100dvh] object-contain block pointer-events-none" />
 
         <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center p-6 text-center">
             <div class="max-w-xl w-full flex flex-col items-center">
-
-                <span
-                    class="gold-accent tracking-[0.4em] uppercase text-[10px] md:text-[12px] mb-3 block font-black bg-black/40 px-3 py-1 rounded-full border border-[#D4AF37]/30">Власне
-                    виробництво • UA</span>
-
-                <h1
-                    class="text-[clamp(48px,8vw,60px)] font-black mb-3 leading-tight uppercase italic text-white drop-shadow-lg">
-                    Звільніть <br><span class="gold-accent">80% місця</span>
-                </h1>
-
-                <p
-                    class="text-gray-200 text-[clamp(14px,3.5vw,18px)] mb-6 font-medium leading-relaxed drop-shadow-md max-w-md">
-                    Надійні підставки зі <span class="text-white font-bold">сталі 8мм із порошковим
-                        фарбуванням.<br></span>
-                    Наведіть ідеальний порядок у домашньому саду за 5 хвилин!
-                </p>
+                <span class="gold-accent tracking-[0.4em] uppercase text-[10px] md:text-[12px] mb-3 block font-black bg-black/40 px-3 py-1 rounded-full border border-[#D4AF37]/30">Власне виробництво • UA</span>
+                <h1 class="text-[clamp(48px,8vw,60px)] font-black mb-3 leading-tight uppercase italic text-white drop-shadow-lg">Звільніть <br><span class="gold-accent">80% місця</span></h1>
+                <p class="text-gray-200 text-[clamp(14px,3.5vw,18px)] mb-6 font-medium leading-relaxed drop-shadow-md max-w-md">Надійні підставки зі <span class="text-white font-bold">сталі 8мм із порошковим фарбуванням.<br></span>Наведіть ідеальний порядок у домашньому саду за 5 хвилин!</p>
 
                 <div class="w-full max-w-xs mb-6">
-                    <a href="#catalog-nav"
-                        class="w-full gold-bg text-black py-4 rounded-2xl font-black uppercase text-sm btn-shadow block text-center">Перейти
-                        до каталогу</a>
+                    <a href="#catalog-nav" class="w-full gold-bg text-black py-4 rounded-2xl font-black uppercase text-sm btn-shadow block text-center">Перейти до каталогу</a>
                 </div>
 
                 <div class="timer-box p-3 mx-auto max-w-xs w-full backdrop-blur-sm bg-black/60">
-                    <p class="text-[10px] uppercase font-black text-gray-300 mb-2 tracking-[0.2em]">Ціна зросте через:
-                    </p>
+                    <p class="text-[10px] uppercase font-black text-gray-300 mb-2 tracking-[0.2em]">Ціна зросте через:</p>
                     <div id="countdown" class="flex justify-center gap-3 text-2xl font-black italic">
-                        <div class="flex flex-col"><span id="hours">23</span><span
-                                class="text-[9px] uppercase text-gray-400 tracking-widest mt-1 font-bold">год</span>
-                        </div>
+                        <div class="flex flex-col"><span id="hours">23</span><span class="text-[9px] uppercase text-gray-400 tracking-widest mt-1 font-bold">год</span></div>
                         <div class="text-[#D4AF37]">:</div>
-                        <div class="flex flex-col"><span id="minutes">59</span><span
-                                class="text-[9px] uppercase text-gray-400 tracking-widest mt-1 font-bold">хв</span>
-                        </div>
+                        <div class="flex flex-col"><span id="minutes">59</span><span class="text-[9px] uppercase text-gray-400 tracking-widest mt-1 font-bold">хв</span></div>
                         <div class="text-[#D4AF37]">:</div>
-                        <div class="flex flex-col text-[#D4AF37]"><span id="seconds">59</span><span
-                                class="text-[9px] uppercase opacity-70 tracking-widest mt-1 font-bold">сек</span></div>
+                        <div class="flex flex-col text-[#D4AF37]"><span id="seconds">59</span><span class="text-[9px] uppercase opacity-70 tracking-widest mt-1 font-bold">сек</span></div>
                     </div>
                 </div>
-
             </div>
         </div>
     </header>
 
-    <div
-        class="bg-[#111] border-y border-[#D4AF37]/20 py-4 px-2 flex justify-between items-center text-center shadow-[0_5px_20px_rgba(0,0,0,0.5)] z-10 relative">
+    <div class="bg-[#111] border-y border-[#D4AF37]/20 py-4 px-2 flex justify-between items-center text-center shadow-[0_5px_20px_rgba(0,0,0,0.5)] z-10 relative">
         <div class="flex items-center gap-3 w-1/2 justify-center border-r border-white/10">
             <span class="text-2xl opacity-90">📦</span>
-            <span
-                class="text-[12px] uppercase font-black text-gray-300 tracking-[0.15em] text-left leading-tight">Оплата
-                при<br><span class="gold-accent">отриманні</span></span>
+            <span class="text-[12px] uppercase font-black text-gray-300 tracking-[0.15em] text-left leading-tight">Оплата при<br><span class="gold-accent">отриманні</span></span>
         </div>
         <div class="flex items-center gap-3 w-1/2 justify-center">
             <span class="text-2xl opacity-90">⏱️</span>
-            <span
-                class="text-[12px] uppercase font-black text-gray-300 tracking-[0.15em] text-left leading-tight">Обмежена<br><span
-                    class="gold-accent">пропозиція</span></span>
+            <span class="text-[12px] uppercase font-black text-gray-300 tracking-[0.15em] text-left leading-tight">Обмежена<br><span class="gold-accent">пропозиція</span></span>
         </div>
     </div>
 
     <section class="py-12 bg-[#080808] border-b border-white/5">
         <div class="max-w-lg mx-auto px-6 space-y-6">
-
-            <div class="flex items-center gap-4">
-                <div
-                    class="w-12 h-12 shrink-0 rounded-2xl bg-[#D4AF37]/10 flex items-center justify-center border border-[#D4AF37]/20 text-2xl">
-                    🌿</div>
-                <div>
-                    <h4 class="gold-accent font-black uppercase text-[14px] mb-1 tracking-wider">Оазис на 0.3 м²</h4>
-                    <p class="text-gray-400 text-[12px] leading-snug">Квіти розміщені ярусами, а ваші підвіконня нарешті
-                        повністю вільні.</p>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-4">
-                <div
-                    class="w-12 h-12 shrink-0 rounded-2xl bg-[#D4AF37]/10 flex items-center justify-center border border-[#D4AF37]/20 text-2xl">
-                    💪</div>
-                <div>
-                    <h4 class="gold-accent font-black uppercase text-[14px] mb-1 tracking-wider">Вічна сталь 8мм</h4>
-                    <p class="text-gray-400 text-[12px] leading-snug">Витримує будь-яку вагу. Порошкова фарба захищає
-                        від вологи та подряпин.</p>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-4">
-                <div
-                    class="w-12 h-12 shrink-0 rounded-2xl bg-[#D4AF37]/10 flex items-center justify-center border border-[#D4AF37]/20 text-2xl">
-                    ☀️</div>
-                <div>
-                    <h4 class="gold-accent font-black uppercase text-[14px] mb-1 tracking-wider">Максимум сонця</h4>
-                    <p class="text-gray-400 text-[12px] leading-snug">Жодної тіні один від одного та ідеальна циркуляція
-                        повітря для росту.</p>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-4">
-                <div
-                    class="w-12 h-12 shrink-0 rounded-2xl bg-[#D4AF37]/10 flex items-center justify-center border border-[#D4AF37]/20 text-2xl">
-                    📐</div>
-                <div>
-                    <h4 class="gold-accent font-black uppercase text-[14px] mb-1 tracking-wider">Універсальні чаші</h4>
-                    <p class="text-gray-400 text-[12px] leading-snug">Ідеально підходять для 95% магазинних горщиків
-                        (від 10 до 24 см).</p>
-                </div>
-            </div>
-
+            <div class="flex items-center gap-4"><div class="w-12 h-12 shrink-0 rounded-2xl bg-[#D4AF37]/10 flex items-center justify-center border border-[#D4AF37]/20 text-2xl">🌿</div><div><h4 class="gold-accent font-black uppercase text-[14px] mb-1 tracking-wider">Оазис на 0.3 м²</h4><p class="text-gray-400 text-[12px] leading-snug">Квіти розміщені ярусами, а ваші підвіконня нарешті повністю вільні.</p></div></div>
+            <div class="flex items-center gap-4"><div class="w-12 h-12 shrink-0 rounded-2xl bg-[#D4AF37]/10 flex items-center justify-center border border-[#D4AF37]/20 text-2xl">💪</div><div><h4 class="gold-accent font-black uppercase text-[14px] mb-1 tracking-wider">Вічна сталь 8мм</h4><p class="text-gray-400 text-[12px] leading-snug">Витримує будь-яку вагу. Порошкова фарба захищає від вологи та подряпин.</p></div></div>
+            <div class="flex items-center gap-4"><div class="w-12 h-12 shrink-0 rounded-2xl bg-[#D4AF37]/10 flex items-center justify-center border border-[#D4AF37]/20 text-2xl">☀️</div><div><h4 class="gold-accent font-black uppercase text-[14px] mb-1 tracking-wider">Максимум сонця</h4><p class="text-gray-400 text-[12px] leading-snug">Жодної тіні один від одного та ідеальна циркуляція повітря для росту.</p></div></div>
+            <div class="flex items-center gap-4"><div class="w-12 h-12 shrink-0 rounded-2xl bg-[#D4AF37]/10 flex items-center justify-center border border-[#D4AF37]/20 text-2xl">📐</div><div><h4 class="gold-accent font-black uppercase text-[14px] mb-1 tracking-wider">Універсальні чаші</h4><p class="text-gray-400 text-[12px] leading-snug">Ідеально підходять для 95% магазинних горщиків (від 10 до 24 см).</p></div></div>
         </div>
     </section>
 
-    <!-- Оновлений блок під вертикальне відео -->
     <section class="py-16 px-4 bg-[#111] border-b border-white/5">
         <div class="max-w-lg mx-auto text-center">
-            <h2 class="text-3xl font-black mb-2 uppercase tracking-tighter text-white">Вживу ще <span
-                    class="gold-accent italic">краще</span></h2>
+            <h2 class="text-3xl font-black mb-2 uppercase tracking-tighter text-white">Вживу ще <span class="gold-accent italic">краще</span></h2>
             <div class="h-0.5 w-16 gold-bg mx-auto mb-8"></div>
-
-            <!-- max-w-[300px] та aspect-[9/16] роблять відео стильним мобільним форматом -->
-            <div id="video-wrapper" onclick="playLocalVideo()"
-                class="relative w-full max-w-[300px] mx-auto aspect-[9/16] rounded-[2.5rem] overflow-hidden border border-[#D4AF37]/30 shadow-[0_15px_50px_rgba(212,175,55,0.15)] cursor-pointer group bg-black isolate">
-
-                <video id="my-video" loop playsinline
-                    class="absolute inset-0 w-full h-full object-cover rounded-[2.5rem] opacity-100 transition-all duration-500">
+            <div id="video-wrapper" onclick="playLocalVideo()" class="relative w-full max-w-[300px] mx-auto aspect-[9/16] rounded-[2.5rem] overflow-hidden border border-[#D4AF37]/30 shadow-[0_15px_50px_rgba(212,175,55,0.15)] cursor-pointer group bg-black isolate">
+                <video id="my-video" loop playsinline class="absolute inset-0 w-full h-full object-cover rounded-[2.5rem] opacity-100 transition-all duration-500">
                     <source src="foto/pidstavka.mp4" type="video/mp4">
-
                 </video>
-
-                <!-- Оверлей з кнопкою -->
-                <div id="play-overlay"
-                    class="absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300 z-10 bg-black/20 group-hover:bg-transparent">
-                    <div
-                        class="w-16 h-16 bg-[#D4AF37] rounded-full flex items-center justify-center text-black pl-1 play-btn transition-all duration-300 shadow-[0_0_30px_rgba(212,175,55,0.6)]">
-                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M4 4l12 6-12 6z" />
-                        </svg>
+                <div id="play-overlay" class="absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300 z-10 bg-black/20 group-hover:bg-transparent">
+                    <div class="w-16 h-16 bg-[#D4AF37] rounded-full play-btn transition-all duration-300 shadow-[0_0_30px_rgba(212,175,55,0.6)] text-black">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z" /></svg>
                     </div>
                 </div>
-
             </div>
-            <p class="text-gray-500 text-[10px] mt-6 uppercase tracking-widest font-bold">Натисніть, щоб подивитися
-                огляд</p>
+            <p class="text-gray-500 text-[10px] mt-6 uppercase tracking-widest font-bold">Натисніть, щоб подивитися огляд</p>
         </div>
     </section>
 
     <section class="py-12 bg-[#080808] border-b border-white/5">
         <div class="max-w-lg mx-auto px-6">
-            <h2 class="text-2xl font-black mb-8 uppercase tracking-tighter text-white text-center">Ідеальне рішення
-                <span class="gold-accent italic">для:</span>
-            </h2>
+            <h2 class="text-2xl font-black mb-8 uppercase tracking-tighter text-white text-center">Ідеальне рішення <span class="gold-accent italic">для:</span></h2>
             <div class="grid grid-cols-2 gap-4">
-                <div class="card-glass p-4 rounded-3xl text-center"><span
-                        class="text-3xl block mb-2 opacity-80">🏡</span>
-                    <h4 class="text-white font-bold uppercase text-[14px] mb-1 tracking-wider">Затишку в домі</h4>
-                    <p class="text-gray-500 text-[12px] leading-relaxed">Стильна композиція без хаосу.</p>
-                </div>
-                <div class="card-glass p-4 rounded-3xl text-center">
-                    <span class="text-3xl block mb-2 opacity-80">✨</span>
-                    <h4 class="text-white font-bold uppercase text-[14px] mb-1 tracking-wider">Стильного інтер'єру</h4>
-                    <p class="text-gray-500 text-[12px] leading-relaxed">Сучасний акцент замість нудних полиць.</p>
-                </div>
-                <div class="card-glass p-4 rounded-3xl text-center"><span
-                        class="text-3xl block mb-2 opacity-80">🪟</span>
-                    <h4 class="text-white font-bold uppercase text-[14px] mb-1 tracking-wider">Вузьких підвіконь</h4>
-                    <p class="text-gray-500 text-[12px] leading-relaxed">Економить місце.</p>
-                </div>
-                <div class="card-glass p-4 rounded-3xl text-center"><span
-                        class="text-3xl block mb-2 opacity-80">🎁</span>
-                    <h4 class="text-white font-bold uppercase text-[14px] mb-1 tracking-wider">На подарунок</h4>
-                    <p class="text-gray-500 text-[12px] leading-relaxed">Річ, що служить роками.</p>
-                </div>
+                <div class="card-glass p-4 rounded-3xl text-center"><span class="text-3xl block mb-2 opacity-80">🏡</span><h4 class="text-white font-bold uppercase text-[14px] mb-1 tracking-wider">Затишку в домі</h4><p class="text-gray-500 text-[12px] leading-relaxed">Стильна композиція без хаосу.</p></div>
+                <div class="card-glass p-4 rounded-3xl text-center"><span class="text-3xl block mb-2 opacity-80">🪴</span><h4 class="text-white font-bold uppercase text-[14px] mb-1 tracking-wider">Масивних вазонів</h4><p class="text-gray-500 text-[12px] leading-relaxed">Надійно тримає важку кераміку без хитань.</p></div>
+                <div class="card-glass p-4 rounded-3xl text-center"><span class="text-3xl block mb-2 opacity-80">🪟</span><h4 class="text-white font-bold uppercase text-[14px] mb-1 tracking-wider">Вузьких підвіконь</h4><p class="text-gray-500 text-[12px] leading-relaxed">Економить місце.</p></div>
+                <div class="card-glass p-4 rounded-3xl text-center"><span class="text-3xl block mb-2 opacity-80">✨</span><h4 class="text-white font-bold uppercase text-[14px] mb-1 tracking-wider">Інтер'єру</h4><p class="text-gray-500 text-[12px] leading-relaxed">Сучасний акцент замість старих полиць.</p></div>
             </div>
         </div>
     </section>
 
-    <div id="catalog-nav"
-        class="sticky top-0 z-40 bg-[#0d0d0d]/95 backdrop-blur-md border-y border-white/10 py-4 px-4 overflow-x-auto whitespace-nowrap hide-scrollbar shadow-xl">
+    <div id="catalog-nav" class="sticky top-0 z-40 bg-[#0d0d0d]/95 backdrop-blur-md border-y border-white/10 py-4 px-4 overflow-x-auto whitespace-nowrap hide-scrollbar shadow-xl">
         <div class="flex gap-3 max-w-lg mx-auto">
-            <a href="#floor"
-                class="nav-btn px-5 py-3 rounded-2xl border border-gray-700 bg-[#161616] text-gray-400 text-[10px] uppercase font-black tracking-widest shrink-0 hover:border-[#D4AF37] hover:text-[#D4AF37] transition-all">На підлогу / Вікно</a>
-            <a href="#wall"
-                class="nav-btn px-5 py-3 rounded-2xl border border-gray-700 bg-[#161616] text-gray-400 text-[10px] uppercase font-black tracking-widest shrink-0 hover:border-[#D4AF37] hover:text-[#D4AF37] transition-all">Настінні</a>
-            <a href="#orchids"
-                class="nav-btn px-5 py-3 rounded-2xl border border-gray-700 bg-[#161616] text-gray-400 text-[10px] uppercase font-black tracking-widest shrink-0 hover:border-[#D4AF37] hover:text-[#D4AF37] transition-all">Для орхідей</a>
+            <a href="#floor" class="nav-btn px-5 py-3 rounded-2xl border border-[#D4AF37] bg-[#D4AF37]/10 text-[#D4AF37] text-[10px] uppercase font-black tracking-widest shrink-0 transition-all">Універсальні</a>
+            <a href="#wall" class="nav-btn px-5 py-3 rounded-2xl border border-gray-700 bg-[#161616] text-gray-400 text-[10px] uppercase font-black tracking-widest shrink-0 hover:border-[#D4AF37] hover:text-[#D4AF37] transition-all">Настінні</a>
+            <a href="#orchids" class="nav-btn px-5 py-3 rounded-2xl border border-gray-700 bg-[#161616] text-gray-400 text-[10px] uppercase font-black tracking-widest shrink-0 hover:border-[#D4AF37] hover:text-[#D4AF37] transition-all">Для орхідей</a>
         </div>
     </div>
 
-    <section class="py-10 px-4 max-w-lg mx-auto">
+    <section class="py-10 px-4 max-w-lg mx-auto overflow-hidden">
         <div id="floor" class="scroll-mt-24 mb-16 hidden">
             <div class="text-center mb-8">
-                <h2 class="text-2xl font-black uppercase tracking-tighter text-white">Напольні <span
-                        class="gold-accent italic">моделі</span></h2>
+                <h2 class="text-2xl font-black uppercase tracking-tighter text-white">Універсальні <span class="gold-accent italic">моделі</span></h2>
                 <div class="h-0.5 w-16 gold-bg mx-auto mt-2"></div>
             </div>
             <div id="floor-items" class="space-y-8"></div>
@@ -320,8 +160,7 @@
 
         <div id="wall" class="scroll-mt-24 mb-16 hidden">
             <div class="text-center mb-8">
-                <h2 class="text-2xl font-black uppercase tracking-tighter text-white">Настінні <span
-                        class="gold-accent italic">підставки</span></h2>
+                <h2 class="text-2xl font-black uppercase tracking-tighter text-white">Настінні <span class="gold-accent italic">підставки</span></h2>
                 <div class="h-0.5 w-16 gold-bg mx-auto mt-2"></div>
             </div>
             <div id="wall-items" class="space-y-8"></div>
@@ -329,8 +168,7 @@
 
         <div id="orchids" class="scroll-mt-24 mb-16 hidden">
             <div class="text-center mb-8">
-                <h2 class="text-2xl font-black uppercase tracking-tighter text-white">Для <span
-                        class="gold-accent italic">орхідей</span></h2>
+                <h2 class="text-2xl font-black uppercase tracking-tighter text-white">Для <span class="gold-accent italic">орхідей</span></h2>
                 <div class="h-0.5 w-16 gold-bg mx-auto mt-2"></div>
             </div>
             <div id="orchids-items" class="space-y-8"></div>
@@ -340,36 +178,25 @@
     <section class="py-16 px-4 bg-[#0a0a0a] border-y border-white/5">
         <div class="max-w-lg mx-auto">
             <div class="text-center mb-10">
-                <h2 class="text-3xl font-black mb-2 uppercase tracking-tighter text-white">Що кажуть <span
-                        class="gold-accent italic">клієнти</span></h2>
+                <h2 class="text-3xl font-black mb-2 uppercase tracking-tighter text-white">Що кажуть <span class="gold-accent italic">клієнти</span></h2>
                 <div class="h-0.5 w-16 gold-bg mx-auto mb-4"></div>
             </div>
             <div class="space-y-4">
                 <div class="card-glass p-6 rounded-[2rem] relative">
                     <div class="absolute top-6 right-6 text-[#D4AF37] text-xs">★★★★★</div>
                     <div class="flex items-center gap-3 mb-4">
-                        <div
-                            class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-white font-black text-sm border border-[#D4AF37]/30">
-                            С</div>
-                        <div>
-                            <h4 class="font-bold text-sm text-white uppercase tracking-wider">Світлана</h4>
-                        </div>
+                        <div class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-white font-black text-sm border border-[#D4AF37]/30">С</div>
+                        <div><h4 class="font-bold text-sm text-white uppercase tracking-wider">Світлана</h4></div>
                     </div>
-                    <p class="text-gray-300 text-xs leading-relaxed italic">"Я вже думала, що ніколи не розгребу ці
-                        горщики, вони були просто скрізь! Замовила, і вуаля – проблема вирішена."</p>
+                    <p class="text-gray-300 text-xs leading-relaxed italic">"Я вже думала, що ніколи не розгребу ці горщики, вони були просто скрізь! Замовила, і вуаля – проблема вирішена."</p>
                 </div>
                 <div class="card-glass p-6 rounded-[2rem] relative">
                     <div class="absolute top-6 right-6 text-[#D4AF37] text-xs">★★★★★</div>
                     <div class="flex items-center gap-3 mb-4">
-                        <div
-                            class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-white font-black text-sm border border-[#D4AF37]/30">
-                            К</div>
-                        <div>
-                            <h4 class="font-bold text-sm text-white uppercase tracking-wider">Катерина</h4>
-                        </div>
+                        <div class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-white font-black text-sm border border-[#D4AF37]/30">К</div>
+                        <div><h4 class="font-bold text-sm text-white uppercase tracking-wider">Катерина</h4></div>
                     </div>
-                    <p class="text-gray-300 text-xs leading-relaxed italic">"Прийшло швидко, упаковано супер.
-                        Конструкція міцна, метал не прогинається. Рекомендую!"</p>
+                    <p class="text-gray-300 text-xs leading-relaxed italic">"Прийшло швидко, упаковано супер. Конструкція міцна, метал не прогинається. Рекомендую!"</p>
                 </div>
             </div>
         </div>
@@ -378,84 +205,47 @@
     <section class="py-16 px-4 bg-[#080808] border-b border-white/5">
         <div class="max-w-lg mx-auto">
             <div class="text-center mb-10">
-                <h2 class="text-3xl font-black mb-2 uppercase tracking-tighter text-white">Як отримати <span
-                        class="gold-accent italic">замовлення</span></h2>
+                <h2 class="text-3xl font-black mb-2 uppercase tracking-tighter text-white">Як отримати <span class="gold-accent italic">замовлення</span></h2>
                 <div class="h-0.5 w-16 gold-bg mx-auto mb-4"></div>
             </div>
             <div class="space-y-4">
-                <div class="card-glass p-5 rounded-[2rem] flex items-center gap-5">
-                    <div
-                        class="w-10 h-10 rounded-full gold-bg flex items-center justify-center text-black font-black text-sm shrink-0 shadow-[0_0_15px_rgba(212,175,55,0.4)]">
-                        1</div>
-                    <div>
-                        <h4 class="text-white font-black uppercase text-[11px] mb-1">Заявка на сайті</h4>
-                        <p class="text-gray-400 text-[10px]">Додайте товари в кошик та залиште номер.</p>
-                    </div>
-                </div>
-                <div class="card-glass p-5 rounded-[2rem] flex items-center gap-5">
-                    <div
-                        class="w-10 h-10 rounded-full border-2 border-[#D4AF37] bg-black flex items-center justify-center text-[#D4AF37] font-black text-sm shrink-0">
-                        2</div>
-                    <div>
-                        <h4 class="text-white font-black uppercase text-[11px] mb-1">Уточнення деталей</h4>
-                        <p class="text-gray-400 text-[10px]">Узгоджуємо всі питання по телефону.</p>
-                    </div>
-                </div>
-                <div class="card-glass p-5 rounded-[2rem] flex items-center gap-5">
-                    <div
-                        class="w-10 h-10 rounded-full border-2 border-[#D4AF37] bg-black flex items-center justify-center text-[#D4AF37] font-black text-sm shrink-0">
-                        3</div>
-                    <div>
-                        <h4 class="text-white font-black uppercase text-[11px] mb-1">Огляд та оплата</h4>
-                        <p class="text-gray-400 text-[10px]">Оплачуєте на пошті після огляду. Жодних ризиків.</p>
-                    </div>
-                </div>
+                <div class="card-glass p-5 rounded-[2rem] flex items-center gap-5"><div class="w-10 h-10 rounded-full gold-bg flex items-center justify-center text-black font-black text-sm shrink-0 shadow-[0_0_15px_rgba(212,175,55,0.4)]">1</div><div><h4 class="text-white font-black uppercase text-[14px] mb-1">Заявка на сайті</h4><p class="text-gray-400 text-[12px]">Додайте товари в кошик та залиште номер.</p></div></div>
+                <div class="card-glass p-5 rounded-[2rem] flex items-center gap-5"><div class="w-10 h-10 rounded-full border-2 border-[#D4AF37] bg-black flex items-center justify-center text-[#D4AF37] font-black text-sm shrink-0">2</div><div><h4 class="text-white font-black uppercase text-[14px] mb-1">Уточнення деталей</h4><p class="text-gray-400 text-[12px]">Узгоджуємо всі питання по телефону.</p></div></div>
+                <div class="card-glass p-5 rounded-[2rem] flex items-center gap-5"><div class="w-10 h-10 rounded-full border-2 border-[#D4AF37] bg-black flex items-center justify-center text-[#D4AF37] font-black text-sm shrink-0">3</div><div><h4 class="text-white font-black uppercase text-[14px] mb-1">Огляд та оплата</h4><p class="text-gray-400 text-[12px]">Оплачуєте на пошті після огляду. Жодних ризиків.</p></div></div>
             </div>
         </div>
     </section>
 
-    <footer class="py-10 text-center text-gray-800 text-[9px] uppercase tracking-[0.4em] bg-[#050505] pb-28">
-        <p>© 2026 Майстерня Сталі</p>
+    <footer class="py-4 text-center text-gray-800 text-[9px] uppercase tracking-[0.4em] bg-[#050505]">
+        <p>© 2026 Майстерня металевих підставок</p>
     </footer>
 
-    <div id="floating-cart"
-        class="floating-cart fixed bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black via-black/95 to-transparent z-50 pb-6 pointer-events-none">
+    <div id="floating-cart" class="floating-cart fixed bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black via-black/95 to-transparent z-50 pb-6 pointer-events-none">
         <div class="max-w-lg mx-auto pointer-events-auto">
-            <button onclick="openCartModal()"
-                class="w-full gold-bg text-black font-black py-4 px-6 rounded-2xl uppercase text-[12px] tracking-widest btn-shadow flex items-center justify-between shadow-[0_0_30px_rgba(212,175,55,0.4)] hover:brightness-110 transition-all">
-                <span class="flex items-center gap-2"><span class="text-lg">🛒</span> Кошик (<span
-                        id="cart-count">0</span>)</span>
+            <button onclick="openCartModal()" class="w-full gold-bg text-black font-black py-4 px-6 rounded-2xl uppercase text-[12px] tracking-widest btn-shadow flex items-center justify-between shadow-[0_0_30px_rgba(212,175,55,0.4)] hover:brightness-110 transition-all">
+                <span class="flex items-center gap-2"><span class="text-lg">🛒</span> Кошик (<span id="cart-count">0</span>)</span>
                 <span id="cart-total" class="font-bold text-sm bg-black/10 px-3 py-1 rounded-lg">0 грн</span>
             </button>
         </div>
     </div>
 
     <div id="cartModal" class="modal">
-        <div
-            class="bg-[#111] p-6 rounded-t-[2rem] rounded-b-[1rem] w-full max-w-lg relative border border-[#D4AF37]/30 shadow-2xl cart-animation max-h-[85vh] overflow-y-auto flex flex-col">
+        <div class="bg-[#111] p-6 rounded-t-[2rem] rounded-b-[1rem] w-full max-w-lg relative border border-[#D4AF37]/30 shadow-2xl cart-animation max-h-[85vh] overflow-y-auto flex flex-col">
             <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
-                <h2 class="text-2xl font-black gold-accent uppercase italic">Оформлення</h2>
-                <button type="button" onclick="closeCartModal()"
-                    class="text-4xl text-gray-500 hover:text-white transition-all leading-none">&times;</button>
+                <h2 class="text-2xl font-black gold-accent uppercase italic">Замовлення</h2>
+                <button type="button" onclick="closeCartModal()" class="text-4xl text-gray-500 hover:text-white transition-all leading-none">&times;</button>
             </div>
-
             <div id="cart-items" class="space-y-3 mb-6 overflow-y-auto pr-2 hide-scrollbar"></div>
-
             <div class="flex justify-between items-center bg-[#1a1a1a] p-4 rounded-xl mb-6 border border-[#D4AF37]/20">
-                <span class="text-gray-400 font-bold uppercase text-[10px] tracking-widest">До сплати:</span>
+                <span class="text-gray-400 font-bold uppercase text-[12px] tracking-widest">До сплати:</span>
                 <span id="cart-modal-total" class="text-2xl font-black text-white gold-accent italic">0 грн</span>
             </div>
             <form id="tgCartForm" class="space-y-3 mt-auto">
-                <input type="text" name="name" placeholder="Ваше ім'я" required
-                    class="w-full p-4 rounded-xl bg-black border border-gray-800 text-white text-sm focus:outline-none focus:border-[#D4AF37]">
-                <input type="tel" name="phone" placeholder="+380" required
-                    class="w-full p-4 rounded-xl bg-black border border-gray-800 text-white text-sm focus:outline-none focus:border-[#D4AF37]">
-                <button type="submit" id="submitBtn"
-                    class="w-full gold-bg text-black font-black py-4 rounded-xl uppercase text-xs btn-shadow mt-2">Підтвердити
-                    замовлення</button>
+                <input type="text" name="name" placeholder="Ваше ім'я" required class="w-full p-4 rounded-xl bg-black border border-gray-800 text-white text-sm focus:outline-none focus:border-[#D4AF37]">
+                <input type="tel" name="phone" placeholder="+380" required class="w-full p-4 rounded-xl bg-black border border-gray-800 text-white text-sm focus:outline-none focus:border-[#D4AF37]">
+                <button type="submit" id="submitBtn" class="w-full gold-bg text-black font-black py-4 rounded-xl uppercase text-xs btn-shadow mt-2">Підтвердити замовлення</button>
             </form>
-            <p class="text-[8px] text-gray-600 mt-4 uppercase tracking-widest text-center">Менеджер зателефонує для
-                уточнення деталей</p>
+            <p class="text-[9px] text-gray-600 mt-4 uppercase tracking-widest text-center">Менеджер зателефонує для уточнення деталей</p>
         </div>
     </div>
 
@@ -480,41 +270,54 @@
 
                 catalogProducts.forEach(product => {
                     const safeName = product.name.replace(/'/g, "\\'");
+                    let imageHTML = product.image ? `<img src="${product.image}" class="w-full h-full object-cover">` : `<span class="text-gray-700 font-black uppercase italic tracking-widest text-xl">ФОТО</span>`;
+                    let badgeHTML = product.badge ? `<div class="absolute top-4 left-4 bg-black/80 backdrop-blur-md px-3 py-1 rounded-lg border border-[#D4AF37]/40 text-[9px] font-black gold-accent uppercase italic">${product.badge}</div>` : '';
 
-                    let imageHTML = product.image
-                        ? `<img src="${product.image}" class="w-full h-full object-cover">`
-                        : `<span class="text-gray-700 font-black uppercase italic tracking-widest text-xl">ФОТО</span>`;
+                    let statsHTML = '';
+                    if (product.dimensions || product.bowls) {
+                        let d = product.dimensions ? product.dimensions.toLowerCase().split('x').map(s => s.trim()) : [];
+                        let b = product.bowls ? product.bowls.split('/').map(s => s.trim()) : [];
 
-                    let badgeHTML = product.badge
-                        ? `<div class="absolute top-4 left-4 bg-black/80 backdrop-blur-md px-3 py-1 rounded-lg border border-[#D4AF37]/40 text-[9px] font-black gold-accent uppercase italic">${product.badge}</div>`
-                        : '';
-
-                    let statsHTML = (product.dimensions || product.bowls) ? `
-                        <div class="stat-box rounded-2xl p-4 mb-6 grid grid-cols-2 gap-4">
-                            <div class="text-left">
-                                <span class="text-[10px] text-gray-300 uppercase font-black block mb-2 tracking-wide">Розміри (см)</span>
-                                <span class="text-lg font-black text-white italic">${product.dimensions ? product.dimensions.replace(/x/gi, '<span class="gold-accent">x</span>') : '-'}</span>
+                        let dimHTML = d.length === 3 ? `
+                            <div class="flex items-end gap-1.5 font-black text-white text-lg tracking-tight">
+                                <div class="flex flex-col items-center leading-none"><span class="text-[12px] text-[#D4AF37] font-bold mb-1">ДОВЖ</span><span>${d[0]}</span></div>
+                                <span class="text-[#D4AF37] text-xs pb-1">x</span>
+                                <div class="flex flex-col items-center leading-none"><span class="text-[12px] text-[#D4AF37] font-bold mb-1">ШИР</span><span>${d[1]}</span></div>
+                                <span class="text-[#D4AF37] text-xs pb-1">x</span>
+                                <div class="flex flex-col items-center leading-none"><span class="text-[12px] text-[#D4AF37] font-bold mb-1">ВИС</span><span>${d[2]}</span></div>
                             </div>
-                            <div class="text-left border-l border-white/10 pl-4">
-                                <span class="text-[10px] text-gray-300 uppercase font-black block mb-2 tracking-wide">Чаша (см)</span>
-                                <span class="text-lg font-black text-white italic">${product.bowls ? product.bowls.replace(/\//g, '<span class="gold-accent">/</span>') : '-'}</span>
-                            </div>
-                        </div>
-                    ` : '';
+                        ` : `<span class="text-lg font-black text-white">${product.dimensions || '-'}</span>`;
 
-                    let oldPriceHTML = product.old_price
-                        ? `<span class="text-gray-600 line-through text-[10px] block font-black leading-none mb-1">${product.old_price} грн</span>`
-                        : '';
+                        let bowlHTML = b.length === 2 ? `
+                            <div class="flex items-end gap-1.5 font-black text-white text-lg tracking-tight">
+                                <div class="flex flex-col items-center leading-none"><span class="text-[12px] text-[#D4AF37] font-bold mb-1">НИЗ</span><span>${b[0]}</span></div>
+                                <span class="text-[#D4AF37] text-xs pb-1">/</span>
+                                <div class="flex flex-col items-center leading-none"><span class="text-[12px] text-[#D4AF37] font-bold mb-1">ВЕРХ</span><span>${b[1]}</span></div>
+                            </div>
+                        ` : `<span class="text-lg font-black text-white">${product.bowls || '-'}</span>`;
+
+                        statsHTML = `
+                            <div class="stat-box rounded-2xl p-4 mb-6 grid grid-cols-2 gap-4">
+                                <div class="text-left flex flex-col justify-between">
+                                    <span class="text-[14px] text-gray-400 uppercase font-black block mb-3 tracking-wide">Габарити (см)</span>
+                                    ${dimHTML}
+                                </div>
+                                <div class="text-left border-l border-white/10 pl-4 flex flex-col justify-between">
+                                    <span class="text-[14px] text-gray-400 uppercase font-black block mb-3 tracking-wide">Чаша (см)</span>
+                                    ${bowlHTML}
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    let oldPriceHTML = product.old_price ? `<span class="text-gray-600 line-through text-[14px] block font-black leading-none mb-1">${product.old_price} грн</span>` : '';
 
                     const cardHTML = `
-                    <div class="card-glass rounded-[2.5rem] overflow-hidden flex flex-col shadow-2xl relative mb-8">
-                        <div id="toast-${product.id}" class="absolute top-4 left-0 right-0 mx-auto w-max bg-[#D4AF37] text-black text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full opacity-0 transition-opacity z-10 pointer-events-none">Додано в кошик!</div>
-                        
+                    <div class="card-glass rounded-[2.5rem] overflow-hidden flex flex-col shadow-2xl relative mb-8 fade-in-up">
                         <div class="h-64 overflow-hidden relative bg-[#111] flex items-center justify-center">
                             ${imageHTML}
                             ${badgeHTML}
                         </div>
-                        
                         <div class="p-6">
                             <h3 class="text-2xl font-black mb-6 uppercase text-white tracking-tight italic">${product.name}</h3>
                             ${statsHTML}
@@ -523,7 +326,10 @@
                                     ${oldPriceHTML}
                                     <span class="text-3xl font-black gold-accent tracking-tighter italic">${product.price} <span class="text-xs">грн</span></span>
                                 </div>
-                                <button onclick="addToCart('${safeName}', ${product.price}, '${product.id}')" class="gold-bg text-black px-6 py-4 rounded-xl font-black uppercase text-[10px] btn-shadow flex items-center gap-2 hover:scale-95 transition-all">В кошик 🛒</button>
+                                <button onclick="addToCart('${safeName}', ${product.price})" class="gold-bg text-black px-6 py-3.5 rounded-xl font-black uppercase text-[14px] btn-shadow flex items-center gap-3 hover:scale-95 transition-all">
+                                    <span>Купити</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" /></svg>
+                                </button>
                             </div>
                         </div>
                     </div>`;
@@ -548,57 +354,44 @@
         function playLocalVideo() {
             const video = document.getElementById('my-video');
             const overlay = document.getElementById('play-overlay');
-
             if (video.muted) {
-                video.muted = false; // Вмикаємо звук
-                video.currentTime = 0; // Починаємо з початку
-                video.play(); // Примусово запускаємо відео
-                overlay.style.opacity = '0';
-                overlay.style.pointerEvents = 'none'; // Щоб клік проходив крізь невидиму кнопку
+                video.muted = false; video.currentTime = 0; video.play();
+                overlay.style.opacity = '0'; overlay.style.pointerEvents = 'none';
             } else {
-                if (video.paused) {
-                    video.play();
-                    overlay.style.opacity = '0';
-                } else {
-                    video.pause();
-                    overlay.style.opacity = '1';
-                }
+                if (video.paused) { video.play(); overlay.style.opacity = '0'; } 
+                else { video.pause(); overlay.style.opacity = '1'; }
             }
         }
 
         // КОШИК
         let cart = [];
+        let toastTimer;
 
-        function addToCart(name, price, toastId) {
+        function addToCart(name, price) {
             let existingItem = cart.find(item => item.name === name);
             if (existingItem) { existingItem.quantity++; } else { cart.push({ name: name, price: price, quantity: 1 }); }
             updateCartUI();
-            const toast = document.getElementById('toast-' + toastId);
-            if (toast) {
-                toast.style.opacity = '1'; toast.style.transform = 'translateY(-10px)';
-                setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(0)'; }, 2000);
+            
+            const toast = document.getElementById('global-toast');
+            const toastName = document.getElementById('toast-product-name');
+            if (toast && toastName) {
+                toastName.innerText = name + ' у кошику';
+                toast.style.opacity = '1'; toast.style.transform = 'translateY(0)';
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(-20px)'; }, 2000);
             }
         }
 
         function removeItem(index) { cart.splice(index, 1); updateCartUI(); }
+        function changeQty(index, delta) { if (cart[index].quantity + delta >= 1) { cart[index].quantity += delta; updateCartUI(); } }
 
-        function changeQty(index, delta) {
-            if (cart[index].quantity + delta >= 1) {
-                cart[index].quantity += delta;
-                updateCartUI();
-            }
-        }
-
-        // Робимо меню каталогу "живим"
+        // ЖИВЕ МЕНЮ КАТАЛОГУ
         document.querySelectorAll('.nav-btn').forEach(button => {
             button.addEventListener('click', function () {
-                // 1. Спочатку робимо всі кнопки сірими (неактивними)
                 document.querySelectorAll('.nav-btn').forEach(btn => {
                     btn.classList.remove('border-[#D4AF37]', 'bg-[#D4AF37]/10', 'text-[#D4AF37]');
                     btn.classList.add('border-gray-700', 'bg-[#161616]', 'text-gray-400');
                 });
-
-                // 2. А тій кнопці, на яку натиснули, даємо золотий колір
                 this.classList.remove('border-gray-700', 'bg-[#161616]', 'text-gray-400');
                 this.classList.add('border-[#D4AF37]', 'bg-[#D4AF37]/10', 'text-[#D4AF37]');
             });
@@ -614,9 +407,7 @@
                 floatingCart.classList.remove('visible');
                 cartItemsContainer.innerHTML = '<p class="text-center text-gray-600 text-xs py-4 font-bold uppercase tracking-widest">Кошик порожній</p>';
                 closeCartModal();
-            } else {
-                floatingCart.classList.add('visible');
-            }
+            } else { floatingCart.classList.add('visible'); }
 
             cart.forEach((item, index) => {
                 totalItems += item.quantity; totalPrice += (item.price * item.quantity);
@@ -628,11 +419,11 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
                         <div class="pr-10">
-                            <h4 class="text-white text-[11px] font-black uppercase tracking-wider mb-1">${item.name}</h4>
-                            <p class="text-[#D4AF37] text-[10px] font-bold mb-3">${item.price} грн / шт</p>
+                            <h4 class="text-white text-[14px] font-black uppercase tracking-wider mb-1">${item.name}</h4>
+                            <p class="text-[#D4AF37] text-[14px] font-bold mb-3">${item.price} грн / шт</p>
                         </div>
                         <div class="flex justify-between items-center pt-3 border-t border-white/5">
-                            <span class="text-gray-500 text-[9px] uppercase tracking-widest font-bold">Кількість:</span>
+                            <span class="text-gray-500 text-[12px] uppercase tracking-widest font-bold">Кількість:</span>
                             <div class="flex items-center gap-3 bg-[#161616] p-1 rounded-xl border border-white/10">
                                 <button type="button" onclick="changeQty(${index}, -1)" class="w-8 h-8 flex items-center justify-center text-gray-400 font-black text-lg transition-all ${minusClass}">-</button>
                                 <span class="text-white text-xs font-black w-4 text-center">${item.quantity}</span>
