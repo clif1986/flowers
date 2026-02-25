@@ -382,40 +382,44 @@
     </div>
 </section>
 
-    <section class="py-16 px-4 bg-[#0a0a0a] border-y border-white/5">
-        <div class="max-w-lg mx-auto">
+<!-- ОНОВЛЕНИЙ БЛОК: Карусель фото-відгуків -->
+    <section class="py-16 bg-[#0a0a0a] border-y border-white/5 overflow-hidden">
+        <div class="max-w-lg mx-auto px-4">
             <div class="text-center mb-10">
-                <h2 class="text-3xl font-black mb-2 uppercase tracking-tighter text-white">Що кажуть <span
-                        class="gold-accent italic">клієнти</span></h2>
+                <h2 class="text-3xl font-black mb-2 uppercase tracking-tighter text-white italic">Що кажуть <span class="gold-accent">клієнти</span></h2>
                 <div class="h-0.5 w-16 gold-bg mx-auto mb-4"></div>
+                <p class="text-gray-500 text-[10px] uppercase tracking-widest font-bold">Гортайте вбік, щоб побачити відгуки</p>
             </div>
-            <div class="space-y-4">
-                <div class="card-glass p-6 rounded-[2rem] relative">
-                    <div class="absolute top-6 right-6 text-[#D4AF37] text-xs">★★★★★</div>
-                    <div class="flex items-center gap-3 mb-4">
-                        <div
-                            class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-white font-black text-sm border border-[#D4AF37]/30">
-                            С</div>
-                        <div>
-                            <h4 class="font-bold text-sm text-white uppercase tracking-wider">Світлана</h4>
-                        </div>
-                    </div>
-                    <p class="text-gray-300 text-xs leading-relaxed italic">"Я вже думала, що ніколи не розгребу ці
-                        горщики, вони були просто скрізь! Замовила, і вуаля – проблема вирішена."</p>
+            
+            <!-- Слайдер для фото-відгуків -->
+            <div class="flex gap-4 overflow-x-auto snap-x hide-scrollbar px-2 pb-4">
+                
+                <!-- Відгук 1: Вставте шлях до фото в src -->
+                <div class="snap-center shrink-0 w-[85%] sm:w-[320px] aspect-[4/5] card-glass rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl">
+                    <img src="foto/feedback1.jpg" alt="Відгук клієнта" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1520301255226-bf5f144451c1?auto=format&fit=crop&q=80'">
                 </div>
-                <div class="card-glass p-6 rounded-[2rem] relative">
-                    <div class="absolute top-6 right-6 text-[#D4AF37] text-xs">★★★★★</div>
-                    <div class="flex items-center gap-3 mb-4">
-                        <div
-                            class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-white font-black text-sm border border-[#D4AF37]/30">
-                            К</div>
-                        <div>
-                            <h4 class="font-bold text-sm text-white uppercase tracking-wider">Катерина</h4>
-                        </div>
-                    </div>
-                    <p class="text-gray-300 text-xs leading-relaxed italic">"Прийшло швидко, упаковано супер.
-                        Конструкція міцна, метал не прогинається. Рекомендую!"</p>
+
+                <!-- Відгук 2 -->
+                <div class="snap-center shrink-0 w-[85%] sm:w-[320px] aspect-[4/5] card-glass rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl">
+                    <img src="foto/feedback2.jpg" alt="Відгук клієнта" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1592150621744-aca64f48394a?auto=format&fit=crop&q=80'">
                 </div>
+
+                <!-- Відгук 3 -->
+                <div class="snap-center shrink-0 w-[85%] sm:w-[320px] aspect-[4/5] card-glass rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl">
+                    <img src="foto/feedback3.jpg" alt="Відгук клієнта" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80'">
+                </div>
+
+                <!-- Відгук 4 -->
+                <div class="snap-center shrink-0 w-[85%] sm:w-[320px] aspect-[4/5] card-glass rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl">
+                    <img src="foto/feedback4.jpg" alt="Відгук клієнта" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&q=80'">
+                </div>
+
+            </div>
+            
+            <div class="flex justify-center gap-1.5 mt-4 opacity-30">
+                <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
+                <div class="w-1.5 h-1.5 rounded-full bg-white/50"></div>
+                <div class="w-1.5 h-1.5 rounded-full bg-white/50"></div>
             </div>
         </div>
     </section>
